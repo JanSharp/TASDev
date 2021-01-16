@@ -20,6 +20,7 @@
         "JanSharpDevEnv": true,
         "WiderNoticeTextBoxes": true,
 
+        "JanSharpsGuiLibrary": true,
         "TASDev": true,
       },
 
@@ -44,6 +45,7 @@
         "JanSharpDevEnv": true,
         "WiderNoticeTextBoxes": true,
 
+        "JanSharpsGuiLibrary": true,
         "TASDev": true,
       },
 
