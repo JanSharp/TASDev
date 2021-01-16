@@ -1,0 +1,13 @@
+{
+  "name": "TASDev",
+  "version": "1.1.0",
+  "factorio_version": "1.1",
+  "title": "TAS Dev",
+  "author": "JanSharp",
+  "contact": "",
+  "homepage": "",
+  "description": "Tools to help with TAS speedrun creation",
+  "dependencies": [
+    "JanSharpsGuiLibrary"
+  ]
+}
