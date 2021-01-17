@@ -1,4 +1,6 @@
 
+local consts = require("consts")
+
 data:extend{
   {
     name = "TASDev-spawn-here-location",
@@ -13,6 +15,6 @@ data:extend{
     type = "int-setting",
     default_value = 10,
     minimum_value = 1,
-    maximum_value = 32,
+    maximum_value = consts.max_row_count,
   },
 }

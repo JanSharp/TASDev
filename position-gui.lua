@@ -2,10 +2,12 @@
 local gui_handler = require("__JanSharpsGuiLibrary__.gui-handler")
 require("__JanSharpsGuiLibrary__.basic-classes")
 local tasdev_util = require("tasdev-util")
-
-local position_gui = {class_name = "position-gui"}
+local consts = require("consts")
 
 local font_size = 14 -- font prototype size
+
+
+local position_gui = {class_name = "position-gui"}
 
 function position_gui.create(player)
   return {
@@ -79,22 +81,16 @@ end
 
 -- local
 
-local function trim_list(list, limit)
-  for i = limit + 1, #list do
-    list[i] = nil
-  end
-end
-
-local function add_to_list_with_limit(list, value, limit)
-  for i = limit, #list do
+local function add_to_list_with_limit(list, value)
+  for i = consts.max_row_count, #list do
     list[i] = nil
   end
   table.insert(list, 1, value)
 end
 
-local function build_positions_string(positions)
+local function build_positions_string(positions, row_count)
   local strings = {}
-  for i = 1, #positions do
+  for i = 1, math.min(#positions, row_count) do
     local position = positions[i]
     if position then
       strings[i] = "{" .. position.x .. ", " .. position.y .. "}"
@@ -111,8 +107,8 @@ function position_gui:add_current_positions()
   local player = self.player
   local selected = player.selected
 
-  add_to_list_with_limit(self.selected_positions, selected and selected.position or false, self.row_count)
-  add_to_list_with_limit(self.player_positions, player.position, self.row_count)
+  add_to_list_with_limit(self.selected_positions, selected and selected.position or false)
+  add_to_list_with_limit(self.player_positions, player.position)
   self:draw()
 end
 
@@ -122,8 +118,8 @@ function position_gui:clear()
 end
 
 function position_gui:draw()
-  self.selected_pos_tb.elem.text = build_positions_string(self.selected_positions)
-  self.player_pos_tb.elem.text = build_positions_string(self.player_positions)
+  self.selected_pos_tb.elem.text = build_positions_string(self.selected_positions, self.row_count)
+  self.player_pos_tb.elem.text = build_positions_string(self.player_positions, self.row_count)
 end
 
 function position_gui:set_location(location)
@@ -136,8 +132,6 @@ end
 
 function position_gui:set_row_count(row_count)
   self.row_count = row_count
-  trim_list(self.selected_positions, row_count)
-  trim_list(self.player_positions, row_count)
   self:draw()
   local height = (font_size + 6) * row_count + 8
   self.selected_pos_tb.elem.style.height = height
