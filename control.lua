@@ -20,7 +20,7 @@ local update_settings_handlers = {
     global.position_guis[player_index]:set_location(location)
   end,
   ["TASDev-position-list-row-count"] = function(player_index)
-    local value = tasdev_util.get_mod_setting_value(player_index, "TASDev-position-list-row-count")
+    global.position_guis[player_index]:set_row_count_from_setting()
   end,
 }
 

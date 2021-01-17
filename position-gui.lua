@@ -6,9 +6,6 @@ local tasdev_util = require("tasdev-util")
 local position_gui = {class_name = "position-gui"}
 
 local font_size = 14 -- font prototype size
-local positions_limit = 20
-
-local textbox_height = (font_size + 6) * positions_limit + 8
 
 function position_gui.create(player)
   return {
@@ -24,13 +21,11 @@ function position_gui.create(player)
           {class_name = "label", {caption = "player"}},
           {class_name = "text-box", name = "selected_pos_tb", parent_pass_count = 1, {
             style_mods = {
-              height = textbox_height,
               width = 220,
             },
           }},
           {class_name = "text-box", name = "player_pos_tb", parent_pass_count = 1, {
             style_mods = {
-              height = textbox_height,
               width = 220,
             },
           }},
@@ -60,8 +55,14 @@ function position_gui.create(player)
   }
 end
 
+-- events
+
 function position_gui:on_elem_created()
-  self:set_location(tasdev_util.get_spawn_location(self.player.index))
+  self:set_location(tasdev_util.get_spawn_location(self.player))
+end
+
+function position_gui:on_create()
+  self:set_row_count_from_setting()
 end
 
 function position_gui:on_click_clear_btn(clear_btn, event)
@@ -71,9 +72,17 @@ end
 
 function position_gui:on_click_spawn_here_btn(spawn_here_btn, event)
   tasdev_util.set_mod_setting_value(
-    self.player.index,
+    self.player,
     "TASDev-spawn-here-location",
     tasdev_util.position_to_str(self.elem.location))
+end
+
+-- local
+
+local function trim_list(list, limit)
+  for i = limit + 1, #list do
+    list[i] = nil
+  end
 end
 
 local function add_to_list_with_limit(list, value, limit)
@@ -96,12 +105,14 @@ local function build_positions_string(positions)
   return table.concat(strings, "\n")
 end
 
+-- class functions
+
 function position_gui:add_current_positions()
   local player = self.player
   local selected = player.selected
 
-  add_to_list_with_limit(self.selected_positions, selected and selected.position or false, positions_limit)
-  add_to_list_with_limit(self.player_positions, player.position, positions_limit)
+  add_to_list_with_limit(self.selected_positions, selected and selected.position or false, self.row_count)
+  add_to_list_with_limit(self.player_positions, player.position, self.row_count)
   self:draw()
 end
 
@@ -117,6 +128,20 @@ end
 
 function position_gui:set_location(location)
   self.elem.location = location
+end
+
+function position_gui:set_row_count_from_setting()
+  self:set_row_count(tasdev_util.get_mod_setting_value(self.player, "TASDev-position-list-row-count"))
+end
+
+function position_gui:set_row_count(row_count)
+  self.row_count = row_count
+  trim_list(self.selected_positions, row_count)
+  trim_list(self.player_positions, row_count)
+  self:draw()
+  local height = (font_size + 6) * row_count + 8
+  self.selected_pos_tb.elem.style.height = height
+  self.player_pos_tb.elem.style.height = height
 end
 
 gui_handler.register_class(position_gui)

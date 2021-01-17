@@ -28,13 +28,13 @@ local function position_to_str(position)
   return "{" .. (position.x or position[1]) .. ", " .. (position.y or position[2]) .. "}"
 end
 
-local function get_spawn_location(player_index)
-  local value = get_mod_setting_value(player_index, "TASDev-spawn-here-location")
+local function get_spawn_location(player_spec)
+  local value = get_mod_setting_value(player_spec, "TASDev-spawn-here-location")
   local success, location = try_get_position(value)
   if not success then
     location = {x = 0, y = 0}
     set_mod_setting_value(
-      player_index,
+      player_spec,
       "TASDev-spawn-here-location",
       position_to_str(location))
   end
