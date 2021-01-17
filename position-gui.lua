@@ -4,10 +4,10 @@ require("__JanSharpsGuiLibrary__.basic-classes")
 
 local position_gui = {class_name = "position-gui"}
 
-local font_size = 14 -- TODO: read from prototype? can you do that?
-local positions_limit = 10
+local font_size = 14 -- font prototype size
+local positions_limit = 20
 
-local textbox_height = (font_size + 8) * positions_limit + 8
+local textbox_height = (font_size + 6) * positions_limit + 8
 
 function position_gui.create(player)
   return {
@@ -24,17 +24,32 @@ function position_gui.create(player)
           {class_name = "text-box", name = "selected_pos_tb", parent_pass_count = 1, {
             style_mods = {
               height = textbox_height,
+              width = 220,
             },
           }},
           {class_name = "text-box", name = "player_pos_tb", parent_pass_count = 1, {
             style_mods = {
               height = textbox_height,
+              width = 220,
             },
           }},
         },
       }},
-      {class_name = "button", name = "clear_btn", {
-        caption = "clear",
+      {class_name = "flow", {
+        children = {
+          {class_name = "button", name = "clear_btn", parent_pass_count = 1, {
+            caption = "clear",
+            style_mods = {
+              width = 60,
+            },
+          }},
+          {class_name = "button", name = "spawn_here_btn", parent_pass_count = 1, {
+            caption = "spawn here",
+            style_mods = {
+              width = 100,
+            },
+          }},
+        },
       }},
     },
 

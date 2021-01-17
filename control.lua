@@ -9,7 +9,7 @@ local function register_player(player)
 end
 
 local function deregister_player(player_index)
-  -- global.position_guis[player_index]:destroy() -- doesn't work. was bugged the entire time in the library. nice :D
+  global.position_guis[player_index]:got_destroyed()
   global.position_guis[player_index] = nil
 end
 
