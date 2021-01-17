@@ -23,12 +23,12 @@ function position_gui.create(player)
           {class_name = "label", {caption = "player"}},
           {class_name = "text-box", name = "selected_pos_tb", parent_pass_count = 1, {
             style_mods = {
-              width = 220,
+              width = 250,
             },
           }},
           {class_name = "text-box", name = "player_pos_tb", parent_pass_count = 1, {
             style_mods = {
-              width = 220,
+              width = 250,
             },
           }},
         },
