@@ -1,6 +1,7 @@
 
 local gui_handler = require("__JanSharpsGuiLibrary__.gui-handler")
 require("__JanSharpsGuiLibrary__.basic-classes")
+local tasdev_util = require("tasdev-util")
 
 local position_gui = {class_name = "position-gui"}
 
@@ -59,9 +60,20 @@ function position_gui.create(player)
   }
 end
 
+function position_gui:on_elem_created()
+  self:set_location(tasdev_util.get_spawn_location(self.player.index))
+end
+
 function position_gui:on_click_clear_btn(clear_btn, event)
   self:clear()
   self:draw()
+end
+
+function position_gui:on_click_spawn_here_btn(spawn_here_btn, event)
+  tasdev_util.set_mod_setting_value(
+    self.player.index,
+    "TASDev-spawn-here-location",
+    tasdev_util.position_to_str(self.elem.location))
 end
 
 local function add_to_list_with_limit(list, value, limit)
@@ -101,6 +113,10 @@ end
 function position_gui:draw()
   self.selected_pos_tb.elem.text = build_positions_string(self.selected_positions)
   self.player_pos_tb.elem.text = build_positions_string(self.player_positions)
+end
+
+function position_gui:set_location(location)
+  self.elem.location = location
 end
 
 gui_handler.register_class(position_gui)
