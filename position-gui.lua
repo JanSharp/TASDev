@@ -1,4 +1,5 @@
 
+require("settings-gui")
 local gui_handler = require("__JanSharpsGuiLibrary__.gui-handler")
 require("__JanSharpsGuiLibrary__.basic-classes")
 local tasdev_util = require("tasdev-util")
@@ -47,6 +48,12 @@ function position_gui.create(player)
               width = 100,
             },
           }},
+          {class_name = "button", name = "settings_btn", parent_pass_count = 1, {
+            caption = "settings",
+            style_mods = {
+              width = 100,
+            },
+          }},
         },
       }},
     },
@@ -77,6 +84,10 @@ function position_gui:on_click_spawn_here_btn(spawn_here_btn, event)
     self.player,
     "TASDev-spawn-here-location",
     tasdev_util.position_to_str(self.elem.location))
+end
+
+function position_gui:on_click_settings_btn(settings_btn, event)
+  self:open_settings()
 end
 
 -- local
@@ -130,12 +141,37 @@ function position_gui:set_row_count_from_setting()
   self:set_row_count(tasdev_util.get_mod_setting_value(self.player, "TASDev-position-list-row-count"))
 end
 
-function position_gui:set_row_count(row_count)
+function position_gui:set_row_count(row_count, do_not_update_settings_gui)
   self.row_count = row_count
   self:draw()
   local height = (font_size + 6) * row_count + 8
   self.selected_pos_tb.elem.style.height = height
   self.player_pos_tb.elem.style.height = height
+
+  if not do_not_update_settings_gui then
+    local settings_gui = self.settings_gui
+    if settings_gui then
+      settings_gui:set_row_count(row_count)
+    end
+  end
+end
+
+function position_gui:open_settings()
+  local settings_gui = self.settings_gui
+  if settings_gui then
+    settings_gui.elem.bring_to_front()
+  else
+    self.settings_gui = gui_handler.create(self.player.gui.screen, "settings-gui", nil, self)
+  end
+end
+
+function position_gui:close_settings()
+  local settings_gui = self.settings_gui
+  if settings_gui then
+    self.elem.bring_to_front()
+    settings_gui:destroy()
+    self.settings_gui = nil
+  end
 end
 
 gui_handler.register_class(position_gui)
