@@ -4,12 +4,7 @@ local tasdev_util = require("tasdev-util")
 
 require("position-gui")
 
-local function register_player(player)
-  local inst = gui_handler.create(player.gui.screen, "position-gui", nil, player)
-  if inst.elem.valid then -- could be deleted already
-    global.position_guis[player.index] = inst
-  end
-end
+local player_deleted_flag = 1
 
 local function deregister_player(player_index)
   local inst = global.position_guis[player_index]
@@ -18,6 +13,20 @@ local function deregister_player(player_index)
   if inst then
     inst:got_destroyed()
     global.position_guis[player_index] = nil
+  else
+    global.position_guis[player_index] = player_deleted_flag
+  end
+end
+
+local function register_player(player)
+  local inst = gui_handler.create(player.gui.screen, "position-gui", nil, player)
+  if inst.elem.valid then -- could be deleted already
+    local is_deleted = global.position_guis[player.index] == player_deleted_flag
+    global.position_guis[player.index] = inst
+    if is_deleted then
+      deregister_player(player.index)
+    else
+    end
   end
 end
 
