@@ -6,21 +6,34 @@ require("position-gui")
 
 local function register_player(player)
   local inst = gui_handler.create(player.gui.screen, "position-gui", nil, player)
-  global.position_guis[player.index] = inst
+  if inst.elem.valid then -- could be deleted already
+    global.position_guis[player.index] = inst
+  end
 end
 
 local function deregister_player(player_index)
-  global.position_guis[player_index]:got_destroyed()
-  global.position_guis[player_index] = nil
+  local inst = global.position_guis[player_index]
+  -- if the event fires while the class is
+  -- still being instantiated, inst will be nil
+  if inst then
+    inst:got_destroyed()
+    global.position_guis[player_index] = nil
+  end
 end
 
 local update_settings_handlers = {
   ["TASDev-spawn-here-location"] = function(player_index)
-    local location = tasdev_util.get_spawn_location(player_index)
-    global.position_guis[player_index]:set_location(location)
+    local inst = global.position_guis[player_index]
+    if inst then
+      local location = tasdev_util.get_spawn_location(player_index)
+      inst:set_location(location)
+    end
   end,
   ["TASDev-position-list-row-count"] = function(player_index)
-    global.position_guis[player_index]:set_row_count_from_setting()
+    local inst = global.position_guis[player_index]
+    if inst then
+      inst:set_row_count_from_setting()
+    end
   end,
 }
 
