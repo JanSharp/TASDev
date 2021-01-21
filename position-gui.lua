@@ -13,7 +13,7 @@ local position_gui = {class_name = "position-gui"}
 function position_gui.create(player)
   return {
     type = "frame",
-    caption = "position gui",
+    caption = "TAS Dev Positions",
     direction = "vertical",
 
     children = {
@@ -22,16 +22,8 @@ function position_gui.create(player)
         children = {
           {class_name = "label", {caption = "selected"}},
           {class_name = "label", {caption = "player"}},
-          {class_name = "text-box", name = "selected_pos_tb", parent_pass_count = 1, {
-            style_mods = {
-              width = 180,
-            },
-          }},
-          {class_name = "text-box", name = "player_pos_tb", parent_pass_count = 1, {
-            style_mods = {
-              width = 200,
-            },
-          }},
+          {class_name = "text-box", name = "selected_pos_tb", parent_pass_count = 1},
+          {class_name = "text-box", name = "player_pos_tb", parent_pass_count = 1},
         },
       }},
       {class_name = "flow", {
@@ -61,6 +53,10 @@ function position_gui.create(player)
     player = player,
     selected_positions = {},
     player_positions = {},
+
+    row_count = consts.default_row_count,
+    tb_width = consts.default_tb_width,
+    decimal_limit = consts.default_decimal_limit,
   }
 end
 
@@ -72,11 +68,13 @@ end
 
 function position_gui:on_create()
   self:set_row_count_from_setting()
+  self:set_tb_width_from_setting()
+  self:set_decimal_limit_from_setting()
 end
 
 function position_gui:on_click_clear_btn(clear_btn, event)
   self:clear()
-  self:draw()
+  self:draw_tb_text()
 end
 
 function position_gui:on_click_spawn_here_btn(spawn_here_btn, event)
@@ -99,12 +97,28 @@ local function add_to_list_with_limit(list, value)
   table.insert(list, 1, value)
 end
 
-local function build_positions_string(positions, row_count)
+local function apply_decimal_limit(value, decimal_limit)
+  local cutoff = 10 ^ (-decimal_limit)
+  local to_trim = value % cutoff
+  value = value - to_trim
+  if to_trim >= cutoff / 2 then
+    value = value + cutoff
+  end
+  if to_trim <= -cutoff / 2 then
+    value = value - cutoff
+  end
+  return value
+end
+
+local function build_positions_string(positions, row_count, decimal_limit)
   local strings = {}
   for i = 1, math.min(#positions, row_count) do
     local position = positions[i]
     if position then
-      strings[i] = "{" .. position.x .. ", " .. position.y .. "}"
+      strings[i] = "{"
+        .. apply_decimal_limit(position.x, decimal_limit) .. ", "
+        .. apply_decimal_limit(position.y, decimal_limit)
+        .. "}"
     else
       strings[i] = ""
     end
@@ -120,7 +134,7 @@ function position_gui:add_current_positions()
 
   add_to_list_with_limit(self.selected_positions, selected and selected.position or false)
   add_to_list_with_limit(self.player_positions, player.position)
-  self:draw()
+  self:draw_tb_text()
 end
 
 function position_gui:clear()
@@ -128,9 +142,16 @@ function position_gui:clear()
   self.player_positions = {}
 end
 
-function position_gui:draw()
-  self.selected_pos_tb.elem.text = build_positions_string(self.selected_positions, self.row_count)
-  self.player_pos_tb.elem.text = build_positions_string(self.player_positions, self.row_count)
+function position_gui:draw_tb_text()
+  self.selected_pos_tb.elem.text = build_positions_string(
+    self.selected_positions,
+    self.row_count,
+    self.decimal_limit)
+
+  self.player_pos_tb.elem.text = build_positions_string(
+    self.player_positions,
+    self.row_count,
+    self.decimal_limit)
 end
 
 function position_gui:set_location(location)
@@ -141,9 +162,17 @@ function position_gui:set_row_count_from_setting()
   self:set_row_count(tasdev_util.get_mod_setting_value(self.player, "TASDev-position-list-row-count"))
 end
 
+function position_gui:set_tb_width_from_setting()
+  self:set_tb_width(tasdev_util.get_mod_setting_value(self.player, "TASDev-tb-width"))
+end
+
+function position_gui:set_decimal_limit_from_setting()
+  self:set_decimal_limit(tasdev_util.get_mod_setting_value(self.player, "TASDev-decimal-limit"))
+end
+
 function position_gui:set_row_count(row_count, do_not_update_settings_gui)
   self.row_count = row_count
-  self:draw()
+  self:draw_tb_text()
   local height = (font_size + 6) * row_count + 8
   self.selected_pos_tb.elem.style.height = height
   self.player_pos_tb.elem.style.height = height
@@ -152,6 +181,31 @@ function position_gui:set_row_count(row_count, do_not_update_settings_gui)
     local settings_gui = self.settings_gui
     if settings_gui then
       settings_gui:set_row_count(row_count)
+    end
+  end
+end
+
+function position_gui:set_tb_width(tb_width, do_not_update_settings_gui)
+  self.tb_width = tb_width
+  self.selected_pos_tb.elem.style.width = tb_width
+  self.player_pos_tb.elem.style.width = tb_width
+
+  if not do_not_update_settings_gui then
+    local settings_gui = self.settings_gui
+    if settings_gui then
+      settings_gui:set_tb_width(tb_width)
+    end
+  end
+end
+
+function position_gui:set_decimal_limit(decimal_limit, do_not_update_settings_gui)
+  self.decimal_limit = decimal_limit
+  self:draw_tb_text()
+
+  if not do_not_update_settings_gui then
+    local settings_gui = self.settings_gui
+    if settings_gui then
+      settings_gui:set_decimal_limit(decimal_limit)
     end
   end
 end

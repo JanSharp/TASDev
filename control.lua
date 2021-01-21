@@ -44,6 +44,18 @@ local update_settings_handlers = {
       inst:set_row_count_from_setting()
     end
   end,
+  ["TASDev-tb-width"] = function(player_index)
+    local inst = global.position_guis[player_index]
+    if inst then
+      inst:set_tb_width_from_setting()
+    end
+  end,
+  ["TASDev-decimal-limit"] = function(player_index)
+    local inst = global.position_guis[player_index]
+    if inst then
+      inst:set_decimal_limit_from_setting()
+    end
+  end,
 }
 
 
