@@ -1,5 +1,5 @@
 
-local gui_hander = require("__JanSharpsGuiLibrary__.gui-handler")
+local gui_handler = require("__JanSharpsGuiLibrary__.gui-handler")
 require("__JanSharpsGuiLibrary__.basic-classes")
 local consts = require("consts")
 local tasdev_util = require("tasdev-util")
@@ -71,4 +71,4 @@ function settings_gui:close()
   self.position_gui:close_settings()
 end
 
-gui_hander.register_class(settings_gui)
+gui_handler.register_class(settings_gui)
