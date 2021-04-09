@@ -72,11 +72,13 @@ end)
 script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
   if event.setting_type == "runtime-per-user" then
     local update_settings_handler = update_settings_handlers[event.setting]
-    if event.player_index then
-      update_settings_handler(event.player_index)
-    else
-      for player_index in next, global.position_guis do
-        update_settings_handler(player_index)
+    if update_settings_handler then
+      if event.player_index then
+        update_settings_handler(event.player_index)
+      else
+        for player_index in next, global.position_guis do
+          update_settings_handler(player_index)
+        end
       end
     end
   end
